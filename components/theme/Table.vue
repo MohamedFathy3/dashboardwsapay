@@ -397,7 +397,7 @@ const sortData = (key, sort) => {
 };
 // Handle Edit Button Click
 const editItem = (item) => {
-  emit("edit-item", item); // Emit the selected item to parent for further editing
+  emit("edit-item", item);
 };
 
 // Confirm Delete for selected Item
@@ -424,8 +424,8 @@ const deletedItems = () => {
 
 // Handle Deleted Items
 const getItems = () => {
-  showDeletedItems.value = false; // Toggle deleted items view
-  emit("get-items"); // Emit to show deleted items
+  showDeletedItems.value = false;
+  emit("get-items");
 };
 
 // Handle Sorting
