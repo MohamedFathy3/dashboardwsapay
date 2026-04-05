@@ -21,7 +21,7 @@ export const useApiStatusUpdate = () => {
         success.value = false
 
         try {
-            const response = await useApiFetch(`/api/${api}/${id}/${type}`, {
+            const response = await useApiFetch(`/${api}/${id}/${type}`, {
                 method: method,
                 body: {  status } // <- ✅ HERE
             })

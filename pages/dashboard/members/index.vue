@@ -1,103 +1,113 @@
 <template>
-  <ClientOnly>
-    <Breadcrumb
-      title="Memebers"
-      :items="[{ label: 'List of members', to: '/members' }]"
-      :add="false"
-      :filter="(filter = true)"
-      @open-filter="openModalFilter"
-      @openModal="openAddModal"
+  <div>
+    <ClientOnly>
+      <Breadcrumb
+        title="Memebers"
+        :items="[{ label: 'List of members', to: '/members' }]"
+        :add="false"
+        :filter="(filter = true)"
+        @open-filter="openModalFilter"
+        @openModal="openAddModal"
+      />
+    </ClientOnly>
+
+    <!-- ===== CARDS (DYNAMIC) ===== -->
+    <div class="row dashboard">
+      <div class="col-lg-3 col-md-6 col-12">
+        <Card
+          :total="statusMap.pending"
+          label="Pending"
+          iconClass="feather icon-clock"
+          colorMain="text-primary"
+          bgClss="bg-rgba-primary"
+        />
+      </div>
+
+      <div class="col-lg-3 col-md-6 col-12">
+        <Card
+          :total="statusMap.approved"
+          label="Approved"
+          iconClass="feather icon-users"
+          colorMain="text-success"
+          bgClss="bg-rgba-success"
+        />
+      </div>
+
+      <div class="col-lg-3 col-md-6 col-12">
+        <Card
+          :total="statusMap.suspended"
+          label="Suspended"
+          iconClass="feather icon-circle"
+          colorMain="text-primary"
+          bgClss="bg-rgba-primary"
+        />
+      </div>
+
+      <div class="col-lg-3 col-md-6 col-12">
+        <Card
+          :total="statusMap.deactivate"
+          label="Deactivate"
+          iconClass="feather icon-lock"
+          colorMain="text-danger"
+          bgClss="bg-rgba-danger"
+        />
+      </div>
+    </div>
+
+    <!-- ===== MODALS ===== -->
+    <Modal
+      :showModal="showModal"
+      @update:showModal="showModal = $event"
+      :formFields="formFields"
+      :title="modalTitle"
+      :apiTitle="apiTitle"
+      :id="selectedId"
+      :refresh="refresh"
     />
-  </ClientOnly>
-  <div class="row dashboard">
-    <div class="col-lg-3 col-md-6 col-12">
-      <Card
-        count="1.2M"
-        label="Pending"
-        iconClass="feather icon-clock"
-        colorMain="text-primary"
-        bgClss="bg-rgba-primary"
-      />
-    </div>
-    <div class="col-lg-3 col-md-6 col-12">
-      <Card
-        count="1.2M"
-        label="Approved"
-        iconClass="feather icon-users"
-        colorMain="text-success"
-        bgClss="bg-rgba-success"
-      />
-    </div>
-    <div class="col-lg-3 col-md-6 col-12">
-      <Card
-        count="1.2M"
-        label="Suspended"
-        iconClass="feather icon-circle"
-        colorMain="text-primary"
-        bgClss="bg-rgba-primary"
-      />
-    </div>
-    <div class="col-lg-3 col-md-6 col-12">
-      <Card
-        count="1.2M"
-        label="Deactivate"
-        iconClass="feather icon-lock"
-        colorMain="text-danger"
-        bgClss="bg-rgba-danger"
-      />
-    </div>
-  </div>
 
-  <Modal
-    :showModal="showModal"
-    @update:showModal="showModal = $event"
-    :formFields="formFields"
-    :title="modalTitle"
-    :apiTitle="apiTitle"
-    :id="selectedId"
-    :refresh="refresh"
-  />
-  <ModalFilter
-    v-if="filter"
-    :title="'Filter Transactions'"
-    :items="filterItems"
-    :modalFilter="modalFilter"
-    @close="modalFilter = false"
-    @filter-filters="submitFilters"
-    @reset-filters="resetFilters"
-  />
-  <div v-if="members === null" class="bg-white">
-    <ThemeSkelton :columns="columns"/>
-  </div>
+    <ModalFilter
+      v-if="filter"
+      :title="'Filter Transactions'"
+      :items="filterItems"
+      :modalFilter="modalFilter"
+      @close="modalFilter = false"
+      @filter-filters="submitFilters"
+      @reset-filters="resetFilters"
+    />
 
-  <Table
-    v-if="members && members.data && members.data.length > 0"
-    :columns="columns"
-    :data="members.data"
-    :meta="members.meta"
-    @change-page="handlePageChange"
-    @change-per-page="handlePerPageChange"
-    @change-search="handleSearchChange"
-    @view-item="viewItem"
-    @edit-item="openEditModal"
-    @delete-item="handleDeleteItem"
-    @delete-selected="handleDeleteSelected"
-    @deleted-items="showDeletedItems"
-    @get-items="showAllItems"
-    @sort-data="handleSortData"
-    :deleteBtns="true"
-    :tableTitle="'members'"
-  />
+    <!-- ===== TABLE ===== -->
+    <div v-if="members === null" class="bg-white">
+      <ThemeSkelton :columns="columns"/>
+    </div>
+
+    <Table
+      v-if="members && members.data && members.data.length > 0"
+      :columns="columns"
+      :data="members.data"
+      :meta="members.meta"
+      @change-page="handlePageChange"
+      @change-per-page="handlePerPageChange"
+      @change-search="handleSearchChange"
+      @view-item="viewItem"
+      @edit-item="openEditModal"
+      @delete-item="handleDeleteItem"
+      @delete-selected="handleDeleteSelected"
+      @deleted-items="showDeletedItems"
+      @get-items="showAllItems"
+      @sort-data="handleSortData"
+      :deleteBtns="true"
+      :tableTitle="'members'"
+    />
+  </div>
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, computed, onMounted, onBeforeUnmount } from "vue";
 import { useNuxtApp } from "#app";
 import Breadcrumb from "@/components/theme/Breadcrumb.vue";
 import Modal from "@/components/theme/Modal.vue";
 import ModalFilter from "@/components/theme/ModalFilter.vue";
 import Card from "@/components/theme/Card.vue";
-
 import Table from "@/components/theme/Table.vue";
 import { useRouter } from "vue-router";
 
@@ -105,7 +115,50 @@ const router = useRouter();
 const memberStore = useMemberStore();
 const { $swal } = useNuxtApp();
 
-// Refs & Reactive States
+// =====================
+//  STATUS API (NEW)
+// =====================
+const statuses = ref([]);
+
+onMounted(async () => {
+  try {
+    const res = await useApiFetch(`/users/statuses`, {
+      method: "POST",
+      body: {},
+    });
+
+    statuses.value = res?.data || [];
+  } catch (err) {
+    console.error(err);
+  }
+});
+
+// =====================
+// STATUS MAP (CARDS)
+// =====================
+const statusMap = computed(() => {
+  const map = {
+    pending: 0,
+    approved: 0,
+    suspended: 0,
+    deactivate: 0,
+  };
+
+  statuses.value.forEach((item) => {
+    const key = String(item.status).trim().toLowerCase();
+    const value = Number(item.total) || 0;
+
+    if (key && key in map) {
+      map[key] += value;
+    }
+  });
+
+  return map;
+});
+
+// =====================
+// EXISTING STATE
+// =====================
 const showModal = ref(false);
 const filter = ref(false);
 
@@ -117,84 +170,45 @@ const formFields = ref([]);
 const currentPage = ref(1);
 const perPage = ref(5);
 const search = ref("");
-const sortColumn = ref('id');
-const sortDirection = ref('desc');
+const sortColumn = ref("id");
+const sortDirection = ref("desc");
 const showDeleted = ref(false);
 const modalFilter = ref(false);
 const appliedFilters = ref({});
 
-
 const members = ref(null);
 
+// =====================
+// FILTERS & TABLE
+// =====================
 const filterItems = [
-  {
-    name: "name",
-    label: "Name",
-    type: "text",
-    placeholder: "Enter name",
-    class: "form-control",
-  },
-  {
-    name: "email",
-    label: "Email",
-    type: "email",
-    placeholder: "Enter email",
-    class: "form-control",
-  },
-  {
-    name: "country_id",
-    label: "Country",
-    type: "select",
-    class: "form-control",
-  },
-  {
-    name: "status",
-    label: "Status",
-    type: "select",
-    class: "form-control",
-  },
+  { name: "name", label: "Name", type: "text", class: "form-control" },
+  { name: "email", label: "Email", type: "email", class: "form-control" },
+  { name: "country_id", label: "Country", type: "select", class: "form-control" },
+  { name: "status", label: "Status", type: "select", class: "form-control" },
 ];
 
-// Table Columns
 const columns = [
   { label: "Name", key: "name" },
   { label: "Status", key: "status" },
   { label: "Actions", key: "actions" },
-
 ];
 
-// Modal Form Fields Config
+// =====================
+// FORM CONFIG
+// =====================
 const formFieldsConfig = [
-  {
-    name: "name",
-    label: "Name",
-    type: "text",
-    placeholder: "Enter name",
-    required: true,
-    class: "form-control",
-  },
-  {
-    name: "email",
-    label: "Email",
-    type: "email",
-    placeholder: "Enter email",
-    required: true,
-    class: "form-control",
-  },
-  {
-    name: "password",
-    label: "Password",
-    type: "password",
-    required: false,
-    class: "form-control",
-  },
+  { name: "name", label: "Name", type: "text", required: true, class: "form-control" },
+  { name: "email", label: "Email", type: "email", required: true, class: "form-control" },
+  { name: "password", label: "Password", type: "password", class: "form-control" },
 ];
 
-// API Data Fetch
+// =====================
+// API LIST
+// =====================
 const { data, refresh } = useApiIndex({
   api: "members",
   key: "members-list",
-
   watch: [
     currentPage,
     perPage,
@@ -211,13 +225,11 @@ const { data, refresh } = useApiIndex({
     order_by: sortColumn.value,
     sort: sortDirection.value,
     deleted: showDeleted.value,
-    filters: {
-      ...appliedFilters.value,
-    },
+    filters: { ...appliedFilters.value },
   }),
 });
 
-// Sync data on change or page reload
+// Sync API → table
 watch(
   data,
   (newData) => {
@@ -226,14 +238,9 @@ watch(
   { immediate: true }
 );
 
-// Page Meta
-definePageMeta({
-  layout: "default",
-  middleware: "auth",
-  title: "members",
-});
-
-// ========== Modal Functions ==========
+// =====================
+// MODAL ACTIONS
+// =====================
 const openAddModal = () => {
   modalTitle.value = "Add Memeber";
   apiTitle.value = "add";
@@ -253,12 +260,9 @@ const openEditModal = (item) => {
   showModal.value = true;
 };
 
-// ===================================
-
-const openModalFilter = () => {
-  modalFilter.value = true;
-};
-// ========== Table Handlers ==========
+// =====================
+// TABLE HANDLERS
+// =====================
 const handlePageChange = (url) => {
   const page = new URL(url).searchParams.get("page");
   if (page) currentPage.value = Number(page);
@@ -277,7 +281,9 @@ const handleSortData = (column) => {
   sortDirection.value = column.sort;
 };
 
-// ========== Deletion ==========
+// =====================
+// DELETE
+// =====================
 const handleDeleteItem = async (id) => {
   if (await confirmDelete()) {
     const { data } = await useApiDelete({ api: "members", ids: [id] });
@@ -298,7 +304,9 @@ const handleDeleteSelected = async (ids) => {
   }
 };
 
-// ========== Toggle Deleted ==========
+// =====================
+// TOGGLE DELETED
+// =====================
 const showDeletedItems = () => {
   showDeleted.value = true;
   currentPage.value = 1;
@@ -309,7 +317,9 @@ const showAllItems = () => {
   currentPage.value = 1;
 };
 
-// ========== Alerts ==========
+// =====================
+// ALERTS
+// =====================
 const confirmDelete = async (count = 1) => {
   const result = await $swal.fire({
     title: "Are you sure?",
@@ -319,11 +329,6 @@ const confirmDelete = async (count = 1) => {
     confirmButtonColor: "#d33",
     cancelButtonColor: "#3085d6",
     confirmButtonText: "Yes, delete it!",
-    customClass: { popup: "custom-swal-popup" },
-    didOpen: () => {
-      const popup = document.querySelector(".swal2-popup");
-      if (popup) popup.style.gridRow = "1";
-    },
   });
   return result.isConfirmed;
 };
@@ -333,50 +338,57 @@ const showDeleteSuccess = () => {
     icon: "success",
     title: "Deleted!",
     text: "The item(s) have been deleted.",
-    confirmButtonText: "OK",
-    customClass: { popup: "custom-swal-popup" },
-    didOpen: () => {
-      const popup = document.querySelector(".swal2-popup");
-      if (popup) popup.style.gridRow = "1";
-    },
   });
 };
-// ========== Filter Submission ==========
-const submitFilters = (filters) => {
-  if (filters && Object.keys(filters).length > 0) {
-    const cleanedFilters = Object.fromEntries(
-      Object.entries(filters).filter(
-        ([_, v]) => v !== null && v !== "" && v !== undefined
-      )
-    );
 
-    appliedFilters.value = cleanedFilters;
-    refresh(); // refresh the API call with updated filters
-  }
+// =====================
+// FILTERS
+// =====================
+const openModalFilter = () => {
+  modalFilter.value = true;
 };
 
-// ========== Cleanup ==========
-onBeforeUnmount(() => {
-  appliedFilters.value = {};
-});
-// Cleanup applied filters when modal is closed
-watch(showModal, (newValue) => {
-  if (!newValue) {
-    appliedFilters.value = {};
-  }
-});
-// Cleanup applied filters when modal is closed
+const submitFilters = (filters) => {
+  const cleaned = Object.fromEntries(
+    Object.entries(filters).filter(([_, v]) => v !== null && v !== "")
+  );
+  appliedFilters.value = cleaned;
+  refresh();
+};
 
 const resetFilters = () => {
   appliedFilters.value = {};
 };
 
+// =====================
+// NAVIGATION
+// =====================
 const viewItem = (id) => {
   memberStore.setMember(id);
   router.push(`/dashboard/members/${id}`);
 };
+
+// =====================
+// CLEANUP
+// =====================
+onBeforeUnmount(() => {
+  appliedFilters.value = {};
+});
+
+watch(showModal, (val) => {
+  if (!val) appliedFilters.value = {};
+});
+
+// =====================
+// PAGE META
+// =====================
+definePageMeta({
+  layout: "default",
+  middleware: "auth",
+  title: "members",
+});
 </script>
 
 <style scoped>
-/* Add custom styles here if needed */
+/* optional */
 </style>

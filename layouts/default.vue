@@ -1,11 +1,11 @@
 <template>
   <div id="app">
     <!-- Sidebar and Navbar components -->
-    <Sidebar />
+    <Sidebar v-if="authStore.isAdmin" />
     <Navbar />
 
     <!-- Main Content Section -->
-    <div class="app-content content">
+    <div class="app-content content" :class="{ 'member-content': authStore.isMember }">
       <div class="content-overlay"></div>
       <div class="header-navbar-shadow"></div>
       <div class="content-wrapper">
@@ -35,6 +35,8 @@ import Footer from "@/components/Footer.vue";
 // Layout lifecycle hooks
 import { onMounted } from "vue";
 
+const authStore = useUserStore();
+
 onMounted(() => {
   document.body.classList.add(
     "vertical-layout",
@@ -59,5 +61,9 @@ onMounted(() => {
   opacity: 0;
 }
 
+.member-content {
+  margin-left: 0 !important;
+  width: 100%;
+}
 
 </style>

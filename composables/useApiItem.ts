@@ -16,7 +16,7 @@ export const useApiItem = ({
     return useAsyncData(
       key || `api-item-${api}-${id}`,
       () =>
-        useApiFetch(`/api/${api}/${id}`, {
+        useApiFetch(`/${api}/${id}`, {
           method: 'GET'
         }),
       {

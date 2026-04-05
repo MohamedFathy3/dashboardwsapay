@@ -2,9 +2,14 @@ import type { UseFetchOptions } from "#app";
 import { useNotify } from '~/composables/useNotify'
 const notify = useNotify()
 
-export function useApiFetch<T>(path: string, options: UseFetchOptions<T> = {}) {
+type ApiFetchOptions<T> = UseFetchOptions<T> & {
+    skipUnauthorizedHandler?: boolean;
+}
+
+export function useApiFetch<T>(path: string, options: ApiFetchOptions<T> = {}) {
     const config = useRuntimeConfig();
     const apiUrl = config.public.apiUrl; // Already includes `/backend`
+    const { skipUnauthorizedHandler = false, onResponseError, ...fetchOptions } = options;
 
     if (!path.startsWith('/')) {
         path = '/' + path; // Ensure the path starts with a slash
@@ -27,12 +32,20 @@ export function useApiFetch<T>(path: string, options: UseFetchOptions<T> = {}) {
     }
 
     return $fetch<T>(`${apiUrl}${path}`, {
-        ...options,
+        ...fetchOptions,
         headers: {
             ...headers,
-            ...(options.headers || {}),
+            ...(fetchOptions.headers || {}),
         },
         onResponseError({ response }) {
+            if (onResponseError) {
+                onResponseError({ response } as any);
+            }
+
+            if (skipUnauthorizedHandler) {
+                return;
+            }
+
             if (response.status === 401) {
                 const message = response?._data.message || 'Login failed, please try again.';
            

@@ -20,12 +20,10 @@ export default defineNuxtConfig({
   },
   nitro: {
     routeRules: {
-      // 👇 هذا هو الـ Proxy الصحيح
       '/api/**': {
-        proxy: `${process.env.API_URL ?? 'https://apipay.wsa-elite.com'}/**`,
-        cors: true,  // 👈 هذا مهم
+        proxy: `${process.env.API_URL ?? 'https://apipay.wsa-elite.com'}/api/**`,
+        cors: true,
       },
-      // يمكنك إضافة proxy للـ sanctum أيضًا
       '/sanctum/**': {
         proxy: `${process.env.API_URL ?? 'https://apipay.wsa-elite.com'}/sanctum/**`,
         cors: true,

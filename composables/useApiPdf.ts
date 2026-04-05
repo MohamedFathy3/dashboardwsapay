@@ -16,7 +16,7 @@ export const useApiPdf = ({
     return useAsyncData(
         key || `api-index-${api}`,
         () =>
-            useApiFetch(`/api/${api}`, {
+            useApiFetch(`/${api}`, {
                 method: 'POST',
                 body: {
                     filters: filters,

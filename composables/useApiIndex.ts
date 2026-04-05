@@ -22,7 +22,7 @@ export const useApiIndex = ({
   return useAsyncData(
     key || `api-index-${api}`,
     () =>
-      useApiFetch(`/api/${api}/index`, {
+      useApiFetch(`/${api}/index`, {
         method: 'POST',
         body: {
           filters: filters,

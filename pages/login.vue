@@ -147,13 +147,18 @@ const v$ = useVuelidate(rules, auth);
 async function login() {
   const result = await v$.value.$validate();
   if (!result) return; // Validation failed, return early
+  errorMessage.value = null;
   const redirect = Array.isArray(redirectPath.value)
     ? redirectPath.value[0]
     : redirectPath.value;
 
   const userStore = useUserStore();
-  
-  await userStore.login(auth.value, redirect);
+
+  try {
+    await userStore.login(auth.value, redirect);
+  } catch (error: any) {
+    errorMessage.value = error?.message || "Login failed. Please try again.";
+  }
 }
 </script>
 

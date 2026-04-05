@@ -195,8 +195,8 @@
                 data-toggle="dropdown"
               >
                 <div class="user-nav d-sm-flex d-none">
-                  <span class="user-name text-bold-600">{{authStore.user?.name ?? ''}}</span
-                  ><span class="user-status">Available</span>
+                  <span class="user-name text-bold-600">{{ authStore.displayName }}</span
+                  ><span class="user-status">{{ authStore.isMember ? 'Member' : 'Admin' }}</span>
                 </div>
                 <span
                   ><img

@@ -16,7 +16,7 @@ export const useApiDelete = ({
     return useAsyncData(
       key || `api-delete-${api}`,
       () =>
-        useApiFetch(`/api/${api}/delete`, {
+        useApiFetch(`/${api}/delete`, {
           method: 'DELETE',
           body: {
             ids

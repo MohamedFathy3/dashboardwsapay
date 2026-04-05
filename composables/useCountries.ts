@@ -11,7 +11,7 @@ export const useCountries = ({
   } = {}) => {
     return useAsyncData(
       key,
-      () => useApiFetch('/api/fetch-countries'),
+      () => useApiFetch('/fetch-countries'),
       {
         lazy,
         server,

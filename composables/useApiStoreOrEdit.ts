@@ -18,7 +18,7 @@ export const useApiStoreOrEdit = ({
     method?: 'POST' | 'PATCH'; // Use or PATCH for edit
   }) => {
     // Determine if we're updating (edit) or creating (store)
-    const endpoint = id ? `/api/${api}/${id}` : `/api/${api}`;
+    const endpoint = id ? `/${api}/${id}` : `/${api}`;
     
     return useAsyncData(
       key || `api-${api}-${id ? 'edit' : 'store'}`,
