@@ -93,11 +93,95 @@ const filterItems = [
 ];
 // Table Columns
 const columns = [
+  { label: "Member", key: "member_display_name" },
   { label: "Amount", key: "amount" },
   { label: "Balance Type", key: "type" },
   { label: "Currency", key: "currency" },
   { label: "Created At", key: "created_at" },
 ];
+
+const memberDisplayNameCache = ref({});
+
+const getTransactionMemberId = (transaction) => {
+  const candidateId =
+    transaction?.member_id ??
+    transaction?.user_id ??
+    transaction?.from_user_id ??
+    transaction?.to_user_id;
+
+  if (candidateId) {
+    return Number(candidateId);
+  }
+
+  const descriptionMatch = transaction?.description?.match(/user\s*#\s*(\d+)/i);
+
+  return descriptionMatch?.[1] ? Number(descriptionMatch[1]) : null;
+};
+
+const getCachedMemberDisplayName = (memberId) => {
+  if (!memberId) return "";
+
+  const cachedMember = memberDisplayNameCache.value[memberId];
+
+  return (
+    cachedMember?.display_name ||
+    cachedMember?.name ||
+    String(memberId)
+  );
+};
+
+const loadMemberDisplayNames = async (transactionsList = []) => {
+  const memberIds = [
+    ...new Set(
+      transactionsList
+        .map((transaction) => getTransactionMemberId(transaction))
+        .filter(Boolean)
+    ),
+  ].filter((memberId) => !memberDisplayNameCache.value[memberId]);
+
+  if (!memberIds.length) return;
+
+  await Promise.all(
+    memberIds.map(async (memberId) => {
+      try {
+        const response = await useApiFetch(`/members/${memberId}`, {
+          method: "GET",
+        });
+
+        const member = response?.data || {};
+
+        memberDisplayNameCache.value = {
+          ...memberDisplayNameCache.value,
+          [memberId]: member,
+        };
+      } catch (error) {
+        console.error(`Failed to load member ${memberId}`, error);
+      }
+    })
+  );
+};
+
+const mapTransactionsWithMemberDisplayName = (transactionsList = []) => {
+  return transactionsList.map((transaction) => {
+    const memberId = getTransactionMemberId(transaction);
+
+    return {
+      ...transaction,
+      member_display_name: memberId
+        ? getCachedMemberDisplayName(memberId)
+        : "N/A",
+    };
+  });
+};
+
+const buildTransactionsPayload = (payload) => {
+  if (!payload) return payload;
+
+  return {
+    ...payload,
+    data: mapTransactionsWithMemberDisplayName(payload.data || []),
+  };
+};
 
 // API Data Fetch
 const { data, refresh } = useApiIndex({
@@ -127,8 +211,14 @@ const { data, refresh } = useApiIndex({
 // Sync data on change or page reload
 watch(
   data,
-  (newData) => {
-    transactions.value = newData;
+  async (newData) => {
+    if (!newData) {
+      transactions.value = newData;
+      return;
+    }
+
+    await loadMemberDisplayNames(newData.data || []);
+    transactions.value = buildTransactionsPayload(newData);
   },
   { immediate: true }
 );

@@ -169,8 +169,14 @@
                     <strong class="d-block text-capitalize">
                       {{ transaction.type === "add" ? "Deposit" : transaction.type }}
                     </strong>
+                    <span
+                      v-if="transaction.member_display_name"
+                      class="d-block text-muted small"
+                    >
+                      {{ transaction.member_display_name }}
+                    </span>
                     <span class="text-muted small">
-                      {{ transaction.description || "No reference provided" }}
+                      {{ transaction.display_description || "No reference provided" }}
                     </span>
                   </div>
                   <div class="text-right">
@@ -290,7 +296,13 @@ type MemberTransaction = {
   amount: number | string;
   currency: string;
   description?: string;
+  display_description?: string;
   createdAt?: string;
+  member_id?: number | string;
+  user_id?: number | string;
+  from_user_id?: number | string;
+  to_user_id?: number | string;
+  member_display_name?: string;
 };
 
 type MemberBalance = {
@@ -308,6 +320,7 @@ const approvedRecipients = ref<MemberRecipient[]>([]);
 const isSubmittingTransfer = ref(false);
 const showPreviewModal = ref(false);
 const transferError = ref("");
+const memberDisplayNameCache = ref<Record<string, { display_name?: string; name?: string }>>({});
 
 const transferForm = ref({
   recipientId: "",
@@ -350,9 +363,57 @@ const transferCurrencies = computed(() =>
     }))
 );
 
-const memberTransactions = computed<MemberTransaction[]>(
-  () => ((authStore.user as any)?.lastTransactions || (authStore.user as any)?.transactions || []) as MemberTransaction[]
-);
+const getTransactionMemberId = (transaction: MemberTransaction) => {
+  const candidateId =
+    transaction.member_id ??
+    transaction.user_id ??
+    transaction.from_user_id ??
+    transaction.to_user_id;
+
+  if (candidateId) {
+    return String(candidateId);
+  }
+
+  const descriptionMatch = transaction.description?.match(/user\s*#\s*(\d+)/i);
+
+  return descriptionMatch?.[1] || "";
+};
+
+const getCachedMemberDisplayName = (memberId: string) => {
+  if (!memberId) return "";
+
+  const cachedMember = memberDisplayNameCache.value[memberId];
+
+  return cachedMember?.display_name || cachedMember?.name || memberId;
+};
+
+const getTransactionDisplayDescription = (transaction: MemberTransaction, memberDisplayName: string) => {
+  const description = transaction.description?.trim();
+
+  if (!description) return "";
+  if (!memberDisplayName) return description;
+
+  return description
+    .replace(/Transfer to user #\d+/i, `Transfer to ${memberDisplayName}`)
+    .replace(/Transfer from user #\d+/i, `Transfer from ${memberDisplayName}`)
+    .replace(/user #\d+/i, memberDisplayName);
+};
+
+const memberTransactions = computed<MemberTransaction[]>(() => {
+  const transactions =
+    (((authStore.user as any)?.lastTransactions || (authStore.user as any)?.transactions || []) as MemberTransaction[]);
+
+  return transactions.map((transaction) => {
+    const memberId = getTransactionMemberId(transaction);
+    const memberDisplayName = memberId ? getCachedMemberDisplayName(memberId) : "";
+
+    return {
+      ...transaction,
+      member_display_name: memberDisplayName,
+      display_description: getTransactionDisplayDescription(transaction, memberDisplayName),
+    };
+  });
+});
 
 const isApprovedMember = computed(
   () => authStore.isMember && authStore.user?.status?.toLowerCase() === "approved"
@@ -449,11 +510,43 @@ const loadMemberProfile = async () => {
 
   try {
     await authStore.fetchAuthUser("member");
+    await loadMemberDisplayNames(
+      (((authStore.user as any)?.lastTransactions || (authStore.user as any)?.transactions || []) as MemberTransaction[])
+    );
   } catch (error: any) {
     notify.error(error?.message || "Failed to load your member profile.");
   } finally {
     isProfileLoading.value = false;
   }
+};
+
+const loadMemberDisplayNames = async (transactionsList: MemberTransaction[] = []) => {
+  const memberIds = [
+    ...new Set(
+      transactionsList
+        .map((transaction) => getTransactionMemberId(transaction))
+        .filter(Boolean)
+    ),
+  ].filter((memberId) => !memberDisplayNameCache.value[memberId]);
+
+  if (!memberIds.length) return;
+
+  await Promise.all(
+    memberIds.map(async (memberId) => {
+      try {
+        const response = await useApiFetch(`/members/${memberId}`, {
+          method: "GET",
+        });
+
+        memberDisplayNameCache.value = {
+          ...memberDisplayNameCache.value,
+          [memberId]: response?.data || {},
+        };
+      } catch (error) {
+        console.error(`Failed to load member ${memberId}`, error);
+      }
+    })
+  );
 };
 
 const loadApprovedRecipients = async () => {
