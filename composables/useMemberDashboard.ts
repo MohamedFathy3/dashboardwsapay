@@ -48,6 +48,7 @@ const BALANCE_CONFIG: Array<Pick<MemberBalance, "currency" | "label">> = [
 export function useMemberDashboard() {
   const memberStore = useMemberStore();
   const notify = useNotify();
+  const memberApi = useMemberApi();
 
   const loading = ref(false);
   const transactionMemberNameCache = ref<Record<string, string>>({});
@@ -158,10 +159,7 @@ export function useMemberDashboard() {
     loading.value = true;
 
     try {
-      const response = await useApiFetch<any>("/check-auth/members", {
-        authType: "member",
-        method: "GET",
-      });
+      const response = await memberApi.getProfile();
 
       const memberData = response?.message?.data || response?.data || {};
 
@@ -183,16 +181,7 @@ export function useMemberDashboard() {
 
   const loadApprovedRecipients = async () => {
     try {
-      const response = await useApiFetch<{ data?: MemberRecipient[] }>("/members/index", {
-        authType: "member",
-        method: "POST",
-        body: {
-          paginate: false,
-          filters: {
-            status: "approved",
-          },
-        },
-      });
+      const response = await memberApi.getRecipients();
 
       recipients.value = (response?.data || []).filter(
         (member) => String(member.id) !== String(profile.value.id),
@@ -240,11 +229,7 @@ export function useMemberDashboard() {
         }
 
         try {
-          const response = await useApiFetch<any>(`/user/member/${memberId}`, {
-            authType: "member",
-            method: "GET",
-            skipUnauthorizedHandler: true,
-          });
+          const response = await memberApi.getMemberById(memberId);
 
           const memberData = response?.data || response?.message?.data || response || {};
           const displayName =

@@ -25,6 +25,9 @@ export const useMemberApi = () => {
       }
     });
 
+  const getMemberById = (memberId: number | string) =>
+    request<any>(`/user/member/${memberId}`, { method: 'GET' });
+
   const transfer = (data: {
     to_user_id: number;
     amount: number;
@@ -32,5 +35,5 @@ export const useMemberApi = () => {
     description: string;
   }) => request<any>('/wallet/transfer', { method: 'POST', body: data });
 
-  return { login, getProfile, getRecipients, transfer };
+  return { login, getProfile, getRecipients, getMemberById, transfer };
 };
