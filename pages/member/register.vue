@@ -31,7 +31,7 @@
                   </div>
                 </div>
 
-                <NuxtLink to="/login" class="register-back-link">
+                <NuxtLink to="/member/login" class="register-back-link">
                   Already approved? Go to login
                 </NuxtLink>
               </div>
@@ -253,7 +253,7 @@
                         {{ isSubmitting ? "Submitting..." : "Submit Application" }}
                       </button>
 
-                      <NuxtLink to="/login" class="btn btn-outline-secondary register-secondary">
+                      <NuxtLink to="/member/login" class="btn btn-outline-secondary register-secondary">
                         Login
                       </NuxtLink>
                     </div>

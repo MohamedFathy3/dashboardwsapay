@@ -112,7 +112,6 @@ import Table from "@/components/theme/Table.vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
-const memberStore = useMemberStore();
 const { $swal } = useNuxtApp();
 
 // =====================
@@ -364,7 +363,6 @@ const resetFilters = () => {
 // NAVIGATION
 // =====================
 const viewItem = (id) => {
-  memberStore.setMember(id);
   router.push(`/dashboard/members/${id}`);
 };
 

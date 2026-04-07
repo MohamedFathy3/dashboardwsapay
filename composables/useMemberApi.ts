@@ -5,6 +5,7 @@ export const useMemberApi = () => {
   const request = async <T>(path: string, options: Record<string, any> = {}): Promise<T> => {
     return await useApiFetch<T>(path, {
       ...options,
+      authType: 'member',
       skipUnauthorizedHandler: true,
     });
   };

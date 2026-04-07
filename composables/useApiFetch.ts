@@ -4,12 +4,13 @@ const notify = useNotify()
 
 type ApiFetchOptions<T> = UseFetchOptions<T> & {
     skipUnauthorizedHandler?: boolean;
+    authType?: 'admin' | 'member';
 }
 
 export function useApiFetch<T>(path: string, options: ApiFetchOptions<T> = {}) {
     const config = useRuntimeConfig();
     const apiUrl = config.public.apiUrl; // Already includes `/backend`
-    const { skipUnauthorizedHandler = false, onResponseError, ...fetchOptions } = options;
+    const { authType = 'admin', skipUnauthorizedHandler = false, onResponseError, ...fetchOptions } = options;
 
     if (!path.startsWith('/')) {
         path = '/' + path; // Ensure the path starts with a slash
@@ -26,7 +27,8 @@ export function useApiFetch<T>(path: string, options: ApiFetchOptions<T> = {}) {
     }
 
     const userStore = useUserStore();
-    const bearerToken = userStore.token;
+    const memberStore = useMemberStore();
+    const bearerToken = authType === 'member' ? memberStore.token : userStore.token;
     if (bearerToken) {
         headers['Authorization'] = `Bearer ${bearerToken}`;
     }
@@ -51,8 +53,15 @@ export function useApiFetch<T>(path: string, options: ApiFetchOptions<T> = {}) {
            
                 notify.error(message);
 
-                userStore.setToken();
-                userStore.setUser();
+                if (authType === 'member') {
+                    memberStore.token = '';
+                    memberStore.profile = null;
+                    memberStore.recipients = [];
+                    navigateTo('/member/login');
+                    return;
+                }
+
+                userStore.clearAuth();
                 navigateTo('/login');
             }
         },

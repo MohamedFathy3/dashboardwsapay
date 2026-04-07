@@ -18,10 +18,21 @@ export const useUserStore = defineStore('user', () => {
   const isAdmin = computed(() => true); // دايماً admin
   const displayName = computed(() => user.value?.displayName || user.value?.name || '');
 
+  const clearCookie = (name: string) => {
+    const cookie = useCookie<string | null>(name, {
+      maxAge: 0,
+      expires: new Date(0),
+    });
+
+    cookie.value = null;
+  };
+
   const clearAuth = () => {
-    token.value = '';
+    token.value = null as any;
     user.value = null;
     accountType.value = 'admin';
+    clearCookie('PFS_AUTH_TOKEN');
+    clearCookie('XSRF-TOKEN');
   };
 
   const fetchAuthUser = async () => {

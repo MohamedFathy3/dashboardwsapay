@@ -14,10 +14,10 @@
             </p>
 
             <div class="hero-actions">
-              <NuxtLink to="/login" class="btn btn-primary hero-button">
+              <NuxtLink to="/member/login" class="btn btn-primary hero-button">
                 Login
               </NuxtLink>
-              <NuxtLink to="/register" class="btn btn-outline-light hero-button hero-button-secondary">
+              <NuxtLink to="/member/register" class="btn btn-outline-light hero-button hero-button-secondary">
                 Open Account / Register
               </NuxtLink>
             </div>

@@ -21,6 +21,16 @@ export const useMemberStore = defineStore('member', () => {
   const balances = computed(() => profile.value?.balances || []);
   const transactions = computed(() => profile.value?.lastTransactions || []);
 
+  const clearCookie = (name: string) => {
+    const cookie = useCookie<string | null>(name, {
+      maxAge: 0,
+      expires: new Date(0),
+      sameSite: 'lax'
+    });
+
+    cookie.value = null;
+  };
+
   const parseProfileData = (response: any): any => {
     // API response structure: { result, data, message: { data: {...}, access_token } }
     const userData = response?.message?.data || response?.data || response;
@@ -48,7 +58,7 @@ export const useMemberStore = defineStore('member', () => {
     };
   };
 
-  const login = async (credentials: LoginCredential, redirectPath = '/dashboard') => {
+  const login = async (credentials: LoginCredential, redirectPath = '/member/dashboard') => {
     isLoading.value = true;
     
     try {
@@ -146,9 +156,11 @@ export const useMemberStore = defineStore('member', () => {
   };
 
   const logout = async (redirectPath = '/member/login') => {
-    token.value = '';
+    token.value = null as any;
     profile.value = null;
     recipients.value = [];
+    clearCookie('MEMBER_AUTH_TOKEN');
+    clearCookie('XSRF-TOKEN');
     await navigateTo(redirectPath);
   };
 

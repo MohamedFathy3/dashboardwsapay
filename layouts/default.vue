@@ -1,11 +1,11 @@
 <template>
   <div id="app">
     <!-- Sidebar and Navbar components -->
-    <Sidebar v-if="authStore.isAdmin" />
+    <Sidebar v-if="authStore.isAdmin && !isMemberArea" />
     <Navbar />
 
     <!-- Main Content Section -->
-    <div class="app-content content" :class="{ 'member-content': authStore.isMember }">
+    <div class="app-content content" :class="{ 'member-content': isMemberArea }">
       <div class="content-overlay"></div>
       <div class="header-navbar-shadow"></div>
       <div class="content-wrapper">
@@ -33,9 +33,13 @@ import Navbar from "@/components/Navbar.vue";
 import Footer from "@/components/Footer.vue";
 
 // Layout lifecycle hooks
-import { onMounted } from "vue";
+import { computed, onMounted } from "vue";
+import { useRoute } from "vue-router";
 
 const authStore = useUserStore();
+const memberStore = useMemberStore();
+const route = useRoute();
+const isMemberArea = computed(() => route.path.startsWith("/member/") && !!memberStore.token);
 
 onMounted(() => {
   document.body.classList.add(

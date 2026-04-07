@@ -195,8 +195,8 @@
                 data-toggle="dropdown"
               >
                 <div class="user-nav d-sm-flex d-none">
-                  <span class="user-name text-bold-600">{{ authStore.displayName }}</span
-                  ><span class="user-status">{{ authStore.isMember ? 'Member' : 'Admin' }}</span>
+                  <span class="user-name text-bold-600">{{ navbarDisplayName }}</span
+                  ><span class="user-status">{{ navbarRole }}</span>
                 </div>
                 <span
                   ><img
@@ -392,14 +392,29 @@
 </template>
 
 <script setup>
-
+import { computed } from "vue";
+import { useRoute } from "vue-router";
 
 const authStore = useUserStore();
+const memberStore = useMemberStore();
+const route = useRoute();
+
+const isMemberArea = computed(() => route.path.startsWith("/member/") && !!memberStore.token);
+const navbarDisplayName = computed(() =>
+  isMemberArea.value
+    ? memberStore.profile?.displayName || memberStore.profile?.name || "Member"
+    : authStore.displayName
+);
+const navbarRole = computed(() => (isMemberArea.value ? "Member" : "Admin"));
 
 const logout = async () => {
   try {
+    if (isMemberArea.value) {
+      await memberStore.logout("/member/login");
+      return;
+    }
+
     await authStore.logout();
-    // Redirect to login page or show a success message
   } catch (error) {
     console.error("Logout failed:", error);
   }

@@ -9,7 +9,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     return navigateTo('/member/login');
   }
   
-  if (to.path === '/dashboard' && !memberStore.isApproved) {
+  if (to.path === '/member/dashboard' && !memberStore.isApproved) {
     return navigateTo('/member/pending');
   }
 });

@@ -64,12 +64,6 @@
                 <span class="menu-item">List</span>
               </NuxtLink>
             </li>
-            <li :class="{ active: isMembersPendingActive }">
-              <NuxtLink to="/dashboard/members/pending" @click.stop="handleLinkClick">
-                <i class="feather icon-circle"></i>
-                <span class="menu-item">Pending</span>
-              </NuxtLink>
-            </li>
           </ul>
         </li>
 

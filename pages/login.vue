@@ -112,13 +112,11 @@
   </section>
 </template>
 
-  
 
-  
   <script setup lang="ts">
 import { email, required } from "@vuelidate/validators";
 import useVuelidate from "@vuelidate/core";
-  
+
 
 definePageMeta({
   layout: "auth",

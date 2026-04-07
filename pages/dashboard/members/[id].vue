@@ -43,7 +43,6 @@
       @error="handleModalError"
       @refresh="handleModalRefresh"
     />
-    
     <!-- Sub Account Modal -->
     <Modal
       :showModal="showSubAccountModal"
@@ -56,7 +55,6 @@
       @error="handleSubAccountError"
       @refresh="handleSubAccountRefresh"
     />
-    
     <section class="user-details">
       <div class="row">
         <!-- Account Info -->
@@ -91,6 +89,7 @@
                       :src="member.data?.country?.flag ?? ''"
                       width="20"
                       class="align-middle radius-2"
+                      alt="Country flag"
                     />
                     {{ member.data?.country?.name ?? "no data" }}
                   </label>
