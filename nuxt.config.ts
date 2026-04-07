@@ -1,10 +1,24 @@
 import tailwindcss from "@tailwindcss/vite";
+import { fileURLToPath } from "node:url";
+
+const nuxtInternalPathsAlias = fileURLToPath(new URL("./nuxt.paths.mjs", import.meta.url));
 
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
+  alias: {
+    "#internal/nuxt/paths": nuxtInternalPathsAlias,
+  },
+  build: {
+    transpile: ["@pinia/nuxt"],
+  },
   css: ['~/assets/css/main.css'],
   vite: {
+    resolve: {
+      alias: {
+        "#internal/nuxt/paths": nuxtInternalPathsAlias,
+      },
+    },
     plugins: [
       tailwindcss(),
     ]
@@ -19,6 +33,9 @@ export default defineNuxtConfig({
     },
   },
   nitro: {
+    alias: {
+      "#internal/nuxt/paths": nuxtInternalPathsAlias,
+    },
     routeRules: {
       '/api/**': {
         proxy: `${process.env.API_URL ?? 'https://apipay.wsa-elite.com'}/api/**`,

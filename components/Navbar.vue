@@ -1,10 +1,10 @@
 <template>
   <!-- BEGIN: Header-->
   <nav
-    class="header-navbar navbar-expand-lg navbar navbar-with-menu floating-nav navbar-light navbar-shadow bg-primary"
+    :class="navbarClasses"
   >
     <div class="navbar-wrapper">
-      <div class="navbar-container content">
+      <div :class="navbarContainerClasses">
         <div class="navbar-collapse justify-end" id="navbar-mobile">
           <ul class="nav navbar-nav float-right">
             <!-- <li class="dropdown dropdown-language nav-item"><a class="dropdown-toggle nav-link" id="dropdown-flag" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="flag-icon flag-icon-us"></i><span class="selected-language">English</span></a>
@@ -407,6 +407,33 @@ const navbarDisplayName = computed(() =>
 );
 const navbarRole = computed(() => (isMemberArea.value ? "Member" : "Admin"));
 
+const navbarClasses = computed(() =>
+  isMemberArea.value
+    ? [
+        "header-navbar",
+        "navbar-expand-lg",
+        "navbar",
+        "navbar-with-menu",
+        "navbar-light",
+        "navbar-shadow",
+        "member-navbar",
+      ]
+    : [
+        "header-navbar",
+        "navbar-expand-lg",
+        "navbar",
+        "navbar-with-menu",
+        "floating-nav",
+        "navbar-light",
+        "navbar-shadow",
+        "bg-primary",
+      ],
+);
+
+const navbarContainerClasses = computed(() =>
+  isMemberArea.value ? "navbar-container member-navbar-container" : "navbar-container content",
+);
+
 const logout = async () => {
   try {
     if (isMemberArea.value) {
@@ -420,3 +447,43 @@ const logout = async () => {
   }
 };
 </script>
+
+<style scoped>
+.member-navbar {
+  left: 0;
+  right: 0;
+  width: 100%;
+  border-radius: 0;
+  background: #1d64b4;
+  box-shadow: 0 18px 45px rgba(16, 35, 63, 0.16);
+}
+
+.member-navbar-container {
+  width: 100%;
+  max-width: none;
+  padding-left: 1.75rem;
+  padding-right: 1.75rem;
+}
+
+.member-navbar :deep(.user-name),
+.member-navbar :deep(.nav-link),
+.member-navbar :deep(.ficon),
+.member-navbar :deep(.feather) {
+  color: #ffffff;
+}
+
+.member-navbar :deep(.user-status) {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.member-navbar :deep(.dropdown-user-link img.round) {
+  border: 2px solid rgba(255, 255, 255, 0.22);
+}
+
+@media (max-width: 767.98px) {
+  .member-navbar-container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+</style>

@@ -1,2 +1,118 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
+
+@layer components {
+  .member-dashboard {
+    @apply pb-4;
+  }
+
+  .member-panel {
+    @apply rounded-[22px] border-0 bg-white;
+    box-shadow: 0 18px 45px rgba(16, 35, 63, 0.08);
+  }
+
+  .member-hero-card {
+    background: linear-gradient(135deg, #ffffff, #f4f8ff);
+  }
+
+  .member-eyebrow {
+    @apply mb-3 inline-block text-[0.78rem] font-bold uppercase tracking-[0.08em] text-[#1f6bc1];
+  }
+
+  .member-title {
+    @apply text-[1.75rem] font-semibold text-[#10233f];
+  }
+
+  .member-balance-card {
+    @apply rounded-[22px] border-0 text-white;
+    background: linear-gradient(160deg, #10233f, #1f6bc1);
+    box-shadow: 0 18px 45px rgba(16, 35, 63, 0.08);
+  }
+
+  .member-balance-label {
+    @apply mb-2 text-[0.82rem] uppercase tracking-[0.06em] text-[rgba(255,255,255,0.72)];
+  }
+
+  .member-balance-amount {
+    @apply mb-1 text-[2rem] font-semibold text-white max-md:text-[1.6rem];
+  }
+
+  .member-balance-code {
+    @apply inline-flex rounded-full bg-[rgba(255,255,255,0.12)] px-[10px] py-[6px] text-[0.8rem];
+  }
+
+  .member-transactions {
+    @apply grid max-h-[420px] gap-3 overflow-y-auto pr-[6px];
+  }
+
+  .member-transaction-item {
+    @apply flex justify-between gap-3 rounded-2xl bg-[#f7f9fc] px-4 py-[14px];
+  }
+
+  .member-empty-state {
+    @apply rounded-2xl bg-[#f7f9fc] p-8 text-center text-[#708198];
+  }
+
+  .transfer-preview-backdrop {
+    @apply fixed inset-0 z-[1050] flex items-center justify-center bg-[rgba(16,35,63,0.42)] p-4;
+  }
+
+  .transfer-preview-card {
+    @apply w-full max-w-[560px] rounded-3xl bg-white p-6;
+    box-shadow: 0 24px 60px rgba(16, 35, 63, 0.18);
+  }
+
+  .transfer-preview-grid {
+    @apply grid grid-cols-1 gap-[14px] sm:grid-cols-2;
+  }
+
+  .preview-label {
+    @apply mb-[6px] block text-[0.82rem] text-[#6d7a8f];
+  }
+
+  .member-label {
+    @apply mb-2 block text-sm font-medium text-slate-700;
+  }
+
+  .member-fieldset {
+    @apply m-0;
+  }
+
+  .member-input,
+  .member-select {
+    @apply block w-full rounded-md border border-[#ced4da] bg-white px-3 py-2 text-base leading-6 text-[#495057] shadow-none transition focus:border-[#86b7fe] focus:outline-none focus:ring-4 focus:ring-[rgba(13,110,253,0.25)] disabled:cursor-not-allowed disabled:bg-[#e9ecef] disabled:text-[#495057] disabled:opacity-100;
+  }
+
+  .member-button-primary {
+    @apply inline-flex items-center justify-center rounded-md border border-[#0d6efd] bg-[#0d6efd] px-4 py-2 text-sm font-medium text-white transition hover:border-[#0b5ed7] hover:bg-[#0b5ed7] disabled:cursor-not-allowed disabled:opacity-65;
+  }
+
+  .member-button-outline {
+    @apply inline-flex items-center justify-center rounded-md border border-[#0d6efd] bg-transparent px-4 py-2 text-sm font-medium text-[#0d6efd] transition hover:bg-[#0d6efd] hover:text-white;
+  }
+
+  .member-button-secondary {
+    @apply inline-flex items-center justify-center rounded-md border border-[#6c757d] bg-transparent px-4 py-2 text-sm font-medium text-[#6c757d] transition hover:bg-[#6c757d] hover:text-white;
+  }
+
+  .member-button-link {
+    @apply inline-flex items-center justify-center border-0 bg-transparent p-0 text-sm font-medium text-slate-500 transition hover:text-slate-700;
+  }
+
+  .member-alert-error {
+    @apply rounded-md border border-[#f5c2c7] bg-[#f8d7da] px-4 py-3 text-[#842029];
+  }
+}
+
+.member-transactions::-webkit-scrollbar {
+  width: 8px;
+}
+
+.member-transactions::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(16, 35, 63, 0.18);
+}
+
+.member-transactions::-webkit-scrollbar-track {
+  background: transparent;
+}

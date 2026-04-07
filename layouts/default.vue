@@ -70,4 +70,8 @@ onMounted(() => {
   width: 100%;
 }
 
+.member-content :deep(.header-navbar-shadow) {
+  display: none;
+}
+
 </style>

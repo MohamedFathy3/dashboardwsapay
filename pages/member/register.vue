@@ -273,174 +273,33 @@
 </template>
 
 <script setup lang="ts">
-import useVuelidate from "@vuelidate/core";
-import { email, helpers, minLength, required } from "@vuelidate/validators";
-
 definePageMeta({
   layout: "auth",
   middleware: "guest",
   title: "Register",
 });
 
-type RegistrationForm = {
-  name: string;
-  displayName: string;
-  email: string;
-  phone: string;
-  password: string;
-  address: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  countryId: string;
-};
-
-type CountryOption = {
-  id: string | number;
-  name: string;
-};
-
-const notify = useNotify();
-const router = useRouter();
-
-const form = ref<RegistrationForm>({
-  name: "",
-  displayName: "",
-  email: "",
-  phone: "",
-  password: "",
-  address: "",
-  city: "",
-  state: "",
-  postalCode: "",
-  countryId: "",
-});
-
-const isSubmitting = ref(false);
-const countriesLoading = ref(true);
-const successMessage = ref("");
-const errorMessage = ref("");
-const countryOptions = ref<CountryOption[]>([]);
-
-const phoneRule = helpers.regex(/^\+?[0-9()\-\s]{7,20}$/);
-
-const rules = computed(() => ({
-  name: { required },
-  displayName: { required },
-  email: { required, email },
-  phone: { required, phoneRule },
-  password: { required, minLength: helpers.withMessage("Password must be at least 8 characters.", minLength(8)) },
-  address: { required },
-  city: { required },
-  state: { required },
-  postalCode: { required },
-  countryId: { required },
-}));
-
-const v$ = useVuelidate(rules, form);
-
-const loadCountries = async () => {
-  countriesLoading.value = true;
-
-  try {
-    const response = await useApiFetch<{ data?: CountryOption[] }>("/fetch-countries");
-    countryOptions.value = response?.data || [];
-  } catch (error: any) {
-    countryOptions.value = [];
-    errorMessage.value = extractErrorMessage(error, "Failed to load countries.");
-    notify.error(errorMessage.value);
-  } finally {
-    countriesLoading.value = false;
-  }
-};
-
-const showError = (field: { $dirty: boolean; $error: boolean }) => field.$dirty && field.$error;
-
-const inputClass = (field: { $dirty: boolean; $error: boolean }) => ({
-  "border border-danger": showError(field),
-});
-
-const resetMessages = () => {
-  successMessage.value = "";
-  errorMessage.value = "";
-};
-
-const resetForm = () => {
-  form.value = {
-    name: "",
-    displayName: "",
-    email: "",
-    phone: "",
-    password: "",
-    address: "",
-    city: "",
-    state: "",
-    postalCode: "",
-    countryId: "",
-  };
-  v$.value.$reset();
-};
-
-const extractErrorMessage = (error: any, fallback: string) => {
-  const apiMessage = error?.data?.message || error?.response?._data?.message;
-
-  if (apiMessage) {
-    return apiMessage;
-  }
-
-  const validationErrors = error?.data?.errors || error?.response?._data?.errors;
-  if (validationErrors && typeof validationErrors === "object") {
-    const firstError = Object.values(validationErrors).flat()[0];
-    if (typeof firstError === "string" && firstError) {
-      return firstError;
-    }
-  }
-
-  return error?.message || fallback;
-};
-
-const submitRegistration = async () => {
-  resetMessages();
-
-  const isValid = await v$.value.$validate();
-  if (!isValid) {
-    errorMessage.value = "Please complete all fields correctly before submitting.";
-    return;
-  }
-
-  isSubmitting.value = true;
-
-  try {
-    await useApiFetch("/application-form", {
-      method: "POST",
-      body: {
-        ...form.value,
-        countryId: String(form.value.countryId),
-        status: "pending",
-      },
-    });
-
-    successMessage.value =
-      "Registration submitted successfully. Your account is pending approval. You will be redirected to login.";
-    notify.success(successMessage.value);
-    resetForm();
-
-    setTimeout(() => {
-      router.push("/login");
-    }, 1400);
-  } catch (error: any) {
-    errorMessage.value = extractErrorMessage(
-      error,
-      "Registration failed. Please review your information and try again."
-    );
-    notify.error(errorMessage.value);
-  } finally {
-    isSubmitting.value = false;
-  }
-};
+const {
+  form,
+  v$,
+  isSubmitting,
+  countriesLoading,
+  successMessage,
+  errorMessage,
+  countryOptions,
+  showError,
+  inputClass,
+  submitRegistration,
+  init,
+  cleanup,
+} = useRegistration();
 
 onMounted(() => {
-  loadCountries();
+  init();
+});
+
+onBeforeUnmount(() => {
+  cleanup();
 });
 </script>
 
