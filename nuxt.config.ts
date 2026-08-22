@@ -32,6 +32,7 @@ export default defineNuxtConfig({
         : process.env.API_URL ?? 'https://apipay.wsa-elite.com',
     },
   },
+  // 
   nitro: {
     alias: {
       "#internal/nuxt/paths": nuxtInternalPathsAlias,
