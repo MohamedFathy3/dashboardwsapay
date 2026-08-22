@@ -89,37 +89,50 @@
         </li>
 
         <!-- Settings -->
-        <li class="nav-item" :class="{ open: openMenu === 'settings' && !menuCollapsed }">
-          <a href="#" @click.stop.prevent="handleMenuClick('settings')" class="menu-toggle">
-            <i class="feather icon-settings"></i>
-            <span class="menu-title" v-if="!menuCollapsed">Settings</span>
-            <i
-              v-if="!menuCollapsed"
-              class="feather float-right mr-0 menu-chevron"
-              :class="getChevronClass('settings')"
-            ></i>
-          </a>
-          <ul class="menu-content" v-if="openMenu === 'settings' && !menuCollapsed">
-            <li :class="{ active: isAdminsActive }">
-              <NuxtLink to="/dashboard/admins" @click.stop="handleLinkClick">
-                <i class="feather icon-users"></i>
-                <span class="menu-item">Admins</span>
-              </NuxtLink>
-            </li>
-            <li :class="{ active: isRolesActive }">
-              <NuxtLink to="/dashboard/roles" @click.stop="handleLinkClick">
-                <i class="feather icon-lock"></i>
-                <span class="menu-item">Roles</span>
-              </NuxtLink>
-            </li>
-            <li :class="{ active: isCountriesActive }">
-              <NuxtLink to="/dashboard/countries" @click.stop="handleLinkClick">
-                <i class="feather icon-globe"></i>
-                <span class="menu-item">Countries</span>
-              </NuxtLink>
-            </li>
-          </ul>
-        </li>
+      <li class="nav-item" :class="{ open: openMenu === 'settings' && !menuCollapsed }">
+  <a href="#" @click.stop.prevent="handleMenuClick('settings')" class="menu-toggle">
+    <i class="feather icon-settings"></i>
+    <span class="menu-title" v-if="!menuCollapsed">Settings</span>
+    <i
+      v-if="!menuCollapsed"
+      class="feather float-right mr-0 menu-chevron"
+      :class="getChevronClass('settings')"
+    ></i>
+  </a>
+  <ul class="menu-content" v-if="openMenu === 'settings' && !menuCollapsed">
+    <li :class="{ active: isAdminsActive }">
+      <NuxtLink to="/dashboard/admins" @click.stop="handleLinkClick">
+        <i class="feather icon-users"></i>
+        <span class="menu-item">Admins</span>
+      </NuxtLink>
+    </li>
+    <li :class="{ active: isRolesActive }">
+      <NuxtLink to="/dashboard/roles" @click.stop="handleLinkClick">
+        <i class="feather icon-lock"></i>
+        <span class="menu-item">Roles</span>
+      </NuxtLink>
+    </li>
+    <li :class="{ active: isCountriesActive }">
+      <NuxtLink to="/dashboard/countries" @click.stop="handleLinkClick">
+        <i class="feather icon-globe"></i>
+        <span class="menu-item">Countries</span>
+      </NuxtLink>
+    </li>
+    <li :class="{ active: isAccountActive }">
+      <NuxtLink to="/dashboard/account" @click.stop="handleLinkClick">
+        <i class="feather icon-credit-card"></i>
+        <span class="menu-item">Bank Account</span>
+      </NuxtLink>
+    </li>
+    <!-- 👇👇👇 هضيف Contacts هنا 👇👇👇 -->
+    <li :class="{ active: isContactsActive }">
+      <NuxtLink to="/dashboard/contacts" @click.stop="handleLinkClick">
+        <i class="feather icon-message-square"></i>
+        <span class="menu-item">Contacts</span>
+      </NuxtLink>
+    </li>
+  </ul>
+</li>
       </ul>
     </div>
   </div>
@@ -162,6 +175,10 @@ const isCountriesActive = computed(() =>
   route.path === '/dashboard/countries'
 )
 
+const isAccountActive = computed(() => 
+  route.path === '/dashboard/account'
+)
+
 // Simple route watcher
 watch(() => route.path, (newPath) => {
   if (newPath.includes('/dashboard/members')) {
@@ -170,7 +187,8 @@ watch(() => route.path, (newPath) => {
     openMenu.value = 'reports'
   } else if (newPath.includes('/dashboard/admins') ||
              newPath.includes('/dashboard/roles') ||
-             newPath.includes('/dashboard/countries')) {
+             newPath.includes('/dashboard/countries') ||
+             newPath.includes('/dashboard/account')) {
     openMenu.value = 'settings'
   } else if (newPath === '/dashboard') {
     openMenu.value = null
