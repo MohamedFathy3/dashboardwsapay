@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://apipay.wsa-elite.com/:path*"
+    }
+  ]
+}
