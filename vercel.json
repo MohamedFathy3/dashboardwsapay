@@ -1,8 +1,8 @@
 {
-  "rewrites": [
+  "builds": [
     {
-      "source": "/api/:path*",
-      "destination": "https://apipay.wsa-elite.com/:path*"
+      "src": "package.json",
+      "use": "@vercel/nuxt"
     }
   ]
 }
