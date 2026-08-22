@@ -27,9 +27,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       appUrl: process.env.APP_URL ?? 'https://trexorstore.com',
-      apiUrl: process.env.NODE_ENV === 'development' 
-        ? '/api' 
-        : process.env.API_URL ?? 'https://apipay.wsa-elite.com',
+      apiUrl: '/api',
     },
   },
   nitro: {
@@ -38,7 +36,7 @@ export default defineNuxtConfig({
     },
     routeRules: {
       '/api/**': {
-        proxy: `${process.env.API_URL ?? 'https://apipay.wsa-elite.com'}/api/**`,
+        proxy: `${process.env.API_URL ?? 'https://apipay.wsa-elite.com'}/**`,
         cors: true,
       },
       '/sanctum/**': {
